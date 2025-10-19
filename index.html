@@ -1,1 +1,464 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Языки разметки: XML, YAML, YML</title>
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff3e7f;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --code-bg: #2d2d44;
+            --xml-color: #ff9800;
+            --yaml-color: #4caf50;
+            --yml-color: #2196f3;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .language-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+        }
+        
+        .xml-card::before {
+            background: var(--xml-color);
+        }
+        
+        .yaml-card::before {
+            background: var(--yaml-color);
+        }
+        
+        .yml-card::before {
+            background: var(--yml-color);
+        }
+        
+        .card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card p {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .code-container {
+            background: var(--code-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .language-tag {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .xml-tag {
+            background: var(--xml-color);
+            color: #000;
+        }
+        
+        .yaml-tag {
+            background: var(--yaml-color);
+            color: #000;
+        }
+        
+        .yml-tag {
+            background: var(--yml-color);
+            color: #000;
+        }
+        
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--light);
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        pre {
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        .xml-code { color: #ff9800; }
+        .yaml-code { color: #4caf50; }
+        .yml-code { color: #2196f3; }
+        
+        .run-btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: block;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .run-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .output-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            min-height: 100px;
+            display: none;
+        }
+        
+        .output-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+        
+        .output-content {
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .language-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .xml-card { animation-delay: 0.1s; }
+        .yaml-card { animation-delay: 0.2s; }
+        .yml-card { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Языки разметки</h1>
+            <p class="subtitle">Изучите XML, YAML и YML с интерактивными примерами. Нажимайте кнопки "Запустить" чтобы увидеть результат!</p>
+        </header>
+        
+        <div class="language-cards">
+            <!-- XML Card -->
+            <div class="card xml-card">
+                <h2>XML</h2>
+                <p>eXtensible Markup Language — язык разметки, который определяет набор правил для кодирования документов в формате, удобном для чтения как человеком, так и компьютером.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="language-tag xml-tag">XML</span>
+                        <button class="copy-btn" data-target="xml-code">Копировать</button>
+                    </div>
+                    <pre id="xml-code" class="xml-code">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;bookstore&gt;
+  &lt;book category="fiction"&gt;
+    &lt;title&gt;Властелин Колец&lt;/title&gt;
+    &lt;author&gt;Дж. Р. Р. Толкин&lt;/author&gt;
+    &lt;year&gt;1954&lt;/year&gt;
+    &lt;price&gt;29.99&lt;/price&gt;
+  &lt;/book&gt;
+  &lt;book category="programming"&gt;
+    &lt;title&gt;Совершенный код&lt;/title&gt;
+    &lt;author&gt;Стив Макконнелл&lt;/author&gt;
+    &lt;year&gt;1993&lt;/year&gt;
+    &lt;price&gt;49.99&lt;/price&gt;
+  &lt;/book&gt;
+&lt;/bookstore&gt;</pre>
+                </div>
+                
+                <button class="run-btn" data-target="xml-output">Запустить XML</button>
+                
+                <div class="output-container" id="xml-output">
+                    <div class="output-title">Результат:</div>
+                    <div class="output-content"></div>
+                </div>
+            </div>
+            
+            <!-- YAML Card -->
+            <div class="card yaml-card">
+                <h2>YAML</h2>
+                <p>YAML Ain't Markup Language — человеко-читаемый формат сериализации данных, концептуально близкий к JSON, но с более простым синтаксисом.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="language-tag yaml-tag">YAML</span>
+                        <button class="copy-btn" data-target="yaml-code">Копировать</button>
+                    </div>
+                    <pre id="yaml-code" class="yaml-code"># Конфигурация приложения
+app:
+  name: "Моё Приложение"
+  version: "1.0.0"
+  settings:
+    debug: true
+    port: 8080
 
+# Пользователи
+users:
+  - name: "Алексей"
+    age: 28
+    roles:
+      - "admin"
+      - "user"
+  - name: "Мария"
+    age: 32
+    roles:
+      - "user"
+
+# Настройки базы данных
+database:
+  host: "localhost"
+  name: "myapp_db"
+  credentials:
+    username: "admin"
+    password: "secret"</pre>
+                </div>
+                
+                <button class="run-btn" data-target="yaml-output">Запустить YAML</button>
+                
+                <div class="output-container" id="yaml-output">
+                    <div class="output-title">Результат:</div>
+                    <div class="output-content"></div>
+                </div>
+            </div>
+            
+            <!-- YML Card -->
+            <div class="card yml-card">
+                <h2>YML</h2>
+                <p>YML (Yandex Market Language) — формат на основе XML, разработанный Яндексом для обмена данными с интернет-магазинами в рамках Яндекс.Маркета.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="language-tag yml-tag">YML</span>
+                        <button class="copy-btn" data-target="yml-code">Копировать</button>
+                    </div>
+                    <pre id="yml-code" class="yml-code">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE yml_catalog SYSTEM "shops.dtd"&gt;
+&lt;yml_catalog date="2023-10-15 12:00"&gt;
+  &lt;shop&gt;
+    &lt;name&gt;Интернет-магазин ТехноМир&lt;/name&gt;
+    &lt;company&gt;ООО "ТехноМир"&lt;/company&gt;
+    &lt;url&gt;https://technomir.ru&lt;/url&gt;
+    &lt;currencies&gt;
+      &lt;currency id="RUR" rate="1"/&gt;
+    &lt;/currencies&gt;
+    &lt;categories&gt;
+      &lt;category id="1"&gt;Смартфоны&lt;/category&gt;
+      &lt;category id="2" parentId="1"&gt;Apple&lt;/category&gt;
+      &lt;category id="3" parentId="1"&gt;Samsung&lt;/category&gt;
+    &lt;/categories&gt;
+    &lt;offers&gt;
+      &lt;offer id="12345"&gt;
+        &lt;name&gt;iPhone 14 Pro 128GB&lt;/name&gt;
+        &lt;categoryId&gt;2&lt;/categoryId&gt;
+        &lt;price&gt;99990&lt;/price&gt;
+        &lt;currencyId&gt;RUR&lt;/currencyId&gt;
+        &lt;description&gt;Новый iPhone 14 Pro с революционной камерой&lt;/description&gt;
+        &lt;url&gt;https://technomir.ru/iphone14pro&lt;/url&gt;
+        &lt;picture&gt;https://technomir.ru/images/iphone14pro.jpg&lt;/picture&gt;
+      &lt;/offer&gt;
+    &lt;/offers&gt;
+  &lt;/shop&gt;
+&lt;/yml_catalog&gt;</pre>
+                </div>
+                
+                <button class="run-btn" data-target="yml-output">Запустить YML</button>
+                
+                <div class="output-container" id="yml-output">
+                    <div class="output-title">Результат:</div>
+                    <div class="output-content"></div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Языки разметки: XML, YAML, YML | Интерактивный обучающий сайт</p>
+        </footer>
+    </div>
+
+    <script>
+        // Функция для копирования кода
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const codeElement = document.getElementById(targetId);
+                const textArea = document.createElement('textarea');
+                textArea.value = codeElement.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Визуальная обратная связь
+                const originalText = this.textContent;
+                this.textContent = 'Скопировано!';
+                setTimeout(() => {
+                    this.textContent = originalText;
+                }, 2000);
+            });
+        });
+        
+        // Функция для запуска примеров
+        document.querySelectorAll('.run-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const outputContainer = document.getElementById(targetId);
+                const outputContent = outputContainer.querySelector('.output-content');
+                
+                // Показать контейнер вывода
+                outputContainer.style.display = 'block';
+                
+                // В зависимости от типа разметки показываем разный результат
+                if (targetId === 'xml-output') {
+                    outputContent.textContent = 'XML успешно обработан!\n\nСтруктура данных:\n- Книжный магазин\n  - Книга (художественная литература)\n    - Название: Властелин Колец\n    - Автор: Дж. Р. Р. Толкин\n  - Книга (программирование)\n    - Название: Совершенный код\n    - Автор: Стив Макконнелл';
+                } else if (targetId === 'yaml-output') {
+                    outputContent.textContent = 'YAML успешно обработан!\n\nПолученная конфигурация:\n- Приложение: Моё Приложение v1.0.0\n- Настройки: порт 8080, режим отладки включен\n- Пользователи: 2 пользователя (Алексей, Мария)\n- База данных: localhost/myapp_db';
+                } else if (targetId === 'yml-output') {
+                    outputContent.textContent = 'YML каталог успешно обработан!\n\nИнформация о магазине:\n- Название: Интернет-магазин ТехноМир\n- Категории: 3 категории (Смартфоны, Apple, Samsung)\n- Товары: 1 предложение (iPhone 14 Pro 128GB)\n- Цена: 99990 RUB';
+                }
+                
+                // Анимация появления
+                outputContainer.style.opacity = '0';
+                outputContainer.style.transform = 'translateY(10px)';
+                
+                let opacity = 0;
+                let translateY = 10;
+                const animate = () => {
+                    opacity += 0.05;
+                    translateY -= 0.5;
+                    outputContainer.style.opacity = opacity;
+                    outputContainer.style.transform = `translateY(${translateY}px)`;
+                    
+                    if (opacity < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+                
+                animate();
+            });
+        });
+    </script>
+</body>
+</html>
